@@ -1,0 +1,37 @@
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Editor & IDE Directories
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# Logs and Temporary Files
+*.log
+*.tmp
+*.bak
+*.old
+tmp/
+.cache/
+
+# Mod Build Archives & Distribution Packs
+*.zip
+*.tar.gz
+*.rar
+build/
+dist/
+
+# Local Project Zomboid Server / Save Test Data
+servertest/
+zomboid_saves/

@@ -1,0 +1,3 @@
+ContextMenu_EN = {
+    ContextMenu_MadScientist_InjectCure = "Inject Knox Virus Vaccine",
+}

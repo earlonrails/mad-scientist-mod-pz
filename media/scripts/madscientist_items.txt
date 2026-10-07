@@ -1,0 +1,19 @@
+module MadScientist
+{
+    imports
+    {
+        Base
+    }
+
+    item KnoxVirusCure
+    {
+        DisplayCategory = Medical,
+        Type = Normal,
+        DisplayName = Knox Virus Vaccine Syringe,
+        Icon = Item_KnoxVirusCure,
+        Weight = 0.1,
+        Medical = TRUE,
+        WorldStaticModel = Syringe,
+        Tooltip = Tooltip_KnoxVirusCure,
+    }
+}

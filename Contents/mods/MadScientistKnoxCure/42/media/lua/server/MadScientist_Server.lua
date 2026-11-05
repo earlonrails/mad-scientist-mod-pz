@@ -1,76 +1,106 @@
 -- MadScientist_Server.lua
 MadScientist = MadScientist or {}
 
---- Spawns and configures the Mad Scientist zombie when a zombie object is initialized
-function MadScientist.OnZombieCreate(zombie)
-    if not zombie then return end
+-- ---------------------------------------------------------------------------
+-- Mad Scientist selection.
+--
+-- Vanilla-sprinter-style behaviour: each zombie gets ONE stable roll stored in
+-- modData (madSciRoll, 0..999999). It becomes the Mad Scientist when
+-- madSciRoll < currentThreshold, where threshold = 1,000,000 / SpawnChance
+-- (SpawnChance = "1 in N"). Because the roll is fixed but the threshold is read
+-- live, LOWERING SpawnChance (bigger threshold) lets already-existing zombies
+-- qualify and convert; RAISING it does not un-convert (one-way, like catching
+-- the virus -- a zombie that already became the scientist stays one).
+--
+-- Evaluated on two cheap triggers (NO per-tick work):
+--   * OnZombieCreate  -> covers freshly spawned + virtual zombies realized as
+--                        the player moves back into an area.
+--   * EveryOneMinute  -> sweeps only the LOADED zombie list (bounded, the ones
+--                        near players) and converts any not-yet-decided zombie
+--                        that now qualifies; already-decided ones early-out.
+-- ---------------------------------------------------------------------------
 
-    local modData = zombie:getModData()
+local MADSCI_ROLL_RANGE = 1000000
 
-    -- Avoid double processing
-    if modData.processedMadScientist then return end
-    modData.processedMadScientist = true
-
-    -- Get sandbox options
+--- Current qualifying threshold from the live SpawnChance ("1 in N").
+--- roll < threshold  => this zombie is the Mad Scientist.
+function MadScientist.GetSpawnThreshold()
     local spawnChance = MadScientist.GetSandboxVar("SpawnChance", 10000)
+    if not spawnChance or spawnChance <= 0 then return 0 end
+    return MADSCI_ROLL_RANGE / spawnChance
+end
+
+--- Transforms a plain zombie into the Mad Scientist (outfit, stats, cure item).
+--- Idempotent via modData.isMadScientist; only runs the expensive setup once.
+function MadScientist.MakeMadScientist(zombie)
+    if not zombie then return end
+    local modData = zombie:getModData()
+    if modData.isMadScientist then return end
+
     local healthMult = MadScientist.GetSandboxVar("HealthMultiplier", 3.0)
     local damageMult = MadScientist.GetSandboxVar("DamageMultiplier", 1.5)
     local cureGuaranteed = MadScientist.GetSandboxVar("CureGuaranteed", true)
 
-    -- Determine if this zombie becomes the Mad Scientist
-    local isSpecialSpawn = false
-    if modData.forceMadScientist then
-        isSpecialSpawn = true
-    else
-        -- ZomboidRandom(N) returns integer from 0 to N-1
-        if ZomboidRandom and spawnChance > 0 then
-            isSpecialSpawn = (ZomboidRandom(spawnChance) == 0)
-        end
-    end
-
-    if not isSpecialSpawn then return end
-
-    -- Mark as Mad Scientist
     modData.isMadScientist = true
     modData.madScientistDamageMult = damageMult
 
-    -- 1. Apply Health Multiplier
+    -- Health multiplier
     local currentHealth = zombie:getHealth() or 1.5
     zombie:setHealth(currentHealth * healthMult)
 
-    -- 2. Give this zombie a STABLE sprinter roll (0-99), mirroring vanilla's
-    --    SprinterPercentage. The roll is fixed per zombie; whether it's actually
-    --    a sprinter is decided each tick by comparing the roll to the CURRENT
-    --    percentage. So raising/lowering the setting mid-game flips already-
-    --    spawned Mad Scientists live (like vanilla), without random flicker.
+    -- Sprinter: stable roll + live threshold (see MadScientist.ApplySpeed)
     modData.madScientistSprintRoll = MadScientist.RollSprintThreshold()
     MadScientist.ApplySpeed(zombie)
 
-    -- 3. Visual & Outfit Setup
-    pcall(function()
-        zombie:dressInNamedOutfit("Doctor")
-    end)
-
+    -- Outfit + attire
+    pcall(function() zombie:dressInNamedOutfit("Doctor") end)
     local inv = zombie:getInventory()
     if inv then
-        -- Inject scientist attire items
         inv:AddItem("Base.LabCoat")
         inv:AddItem("Base.Glasses_Reading")
         inv:AddItem("Base.Gloves_Surgical")
         inv:AddItem("Base.Mask_Surgical")
-
-        -- 4. Inject Knox Virus Vaccine Syringe
         if cureGuaranteed then
             inv:AddItem("MadScientist.KnoxVirusCure")
         end
     end
 
-    print("[MadScientist Mod] Mad Scientist Zombie spawned! (SprintRoll=" .. tostring(modData.madScientistSprintRoll) .. ", HealthMult=" .. tostring(healthMult) .. "x)")
+    print("[MadScientist Mod] Mad Scientist Zombie created! (SprintRoll=" ..
+        tostring(modData.madScientistSprintRoll) .. ", HealthMult=" .. tostring(healthMult) .. "x)")
 end
 
---- Returns a stable per-zombie sprinter roll in 0..99. Stored once at spawn and
---- compared to the CURRENT SprinterPercentage each tick (roll < pct = sprinter),
---- so a zombie's identity is fixed but the threshold is live, like vanilla.
+--- Assigns the stable roll if missing, then converts the zombie IF it now
+--- qualifies under the live threshold. Cheap: an int compare for the common
+--- "already decided / doesn't qualify" case. Returns true if it converted.
+function MadScientist.EvaluateZombie(zombie)
+    if not zombie then return false end
+    local modData = zombie:getModData()
+    if modData.isMadScientist then return false end       -- already one, done
+    if modData.forceMadScientist then
+        MadScientist.MakeMadScientist(zombie)
+        return true
+    end
+
+    -- Stable per-zombie roll, assigned once and persisted in modData.
+    if modData.madSciRoll == nil then
+        modData.madSciRoll = ZomboidRandom and ZomboidRandom(MADSCI_ROLL_RANGE) or 0
+    end
+
+    if modData.madSciRoll < MadScientist.GetSpawnThreshold() then
+        MadScientist.MakeMadScientist(zombie)
+        return true
+    end
+    return false
+end
+
+--- Fired when a zombie object is created (fresh spawn or virtual->real).
+function MadScientist.OnZombieCreate(zombie)
+    MadScientist.EvaluateZombie(zombie)
+end
+
+--- Returns a stable per-zombie sprinter roll in 0..99. Stored once when the
+--- zombie becomes a Mad Scientist and compared to the CURRENT SprinterPercentage
+--- (roll < pct = sprinter), so its identity is fixed but the threshold is live.
 function MadScientist.RollSprintThreshold()
     if ZomboidRandom then
         return ZomboidRandom(100) -- 0..99
@@ -94,11 +124,10 @@ function MadScientist.ShouldSprint(zombie)
     return roll < pct
 end
 
---- Enforces the Mad Scientist's current speed type via the real IsoZombie API.
 --- Applies the Mad Scientist's current speed type via the real IsoZombie API.
---- Called at spawn and only re-applied when SprinterPercentage changes (see
---- MadScientist.OnSprinterPctChanged) — matching vanilla, which caches each
---- zombie's speedType rather than recomputing it every tick.
+--- Called when a zombie becomes the Mad Scientist and re-applied during the
+--- periodic sweep — matching vanilla, which caches each zombie's speedType
+--- rather than recomputing it every tick.
 function MadScientist.ApplySpeed(zombie)
     if not zombie then return end
     local wantSprinter = MadScientist.ShouldSprint(zombie)
@@ -125,26 +154,39 @@ function MadScientist.ApplySpeed(zombie)
     end
 end
 
--- Tracks the last-seen SprinterPercentage so we only sweep zombies on a change.
+-- Tracks last-seen SprinterPercentage so existing scientists' speed is only
+-- re-applied when it actually changed (otherwise it's left cached).
 MadScientist.lastSprinterPct = nil
 
---- Periodic cheap check: if SprinterPercentage changed since last time, sweep
---- the currently-loaded zombies once and re-apply speed to Mad Scientists.
---- This mirrors vanilla's cached model (no per-tick work) while still making a
---- mid-game setting change take effect on already-spawned Mad Scientists.
-function MadScientist.OnSprinterPctChanged()
-    local pct = MadScientist.GetSandboxVar("SprinterPercentage", 100)
-    if pct == MadScientist.lastSprinterPct then return end
-    MadScientist.lastSprinterPct = pct
-
+--- Single cheap periodic pass over the LOADED zombie list (the ones near
+--- players; bounded). Does two jobs in one loop so there is only ever one
+--- sweep per minute:
+---   1. Convert not-yet-decided zombies that now qualify as Mad Scientist
+---      (lets existing nearby zombies turn after SpawnChance is lowered).
+---   2. If SprinterPercentage changed, re-apply speed to existing scientists.
+--- No per-tick work anywhere; each zombie is an int compare + early-out.
+function MadScientist.OnPeriodicSweep()
     local cell = getCell and getCell()
     if not cell then return end
     local zombies = cell:getZombieList()
     if not zombies then return end
+
+    local threshold = MadScientist.GetSpawnThreshold()
+    local pct = MadScientist.GetSandboxVar("SprinterPercentage", 100)
+    local sprinterChanged = (pct ~= MadScientist.lastSprinterPct)
+    MadScientist.lastSprinterPct = pct
+
+    -- Nothing to do if no conversions are possible AND sprinter % is unchanged.
+    if threshold <= 0 and not sprinterChanged then return end
+
     for i = 0, zombies:size() - 1 do
         local z = zombies:get(i)
-        if z and MadScientist.IsMadScientist(z) then
-            MadScientist.ApplySpeed(z)
+        if z then
+            if z:getModData().isMadScientist then
+                if sprinterChanged then MadScientist.ApplySpeed(z) end
+            elseif threshold > 0 then
+                MadScientist.EvaluateZombie(z)
+            end
         end
     end
 end
@@ -179,8 +221,10 @@ end
 -- Register Event Handlers
 Events.OnZombieCreate.Add(MadScientist.OnZombieCreate)
 Events.OnZombieDead.Add(MadScientist.OnZombieDead)
--- Cheap periodic check (not per-tick) to re-apply speed only when the
--- SprinterPercentage sandbox option changes mid-game, mirroring vanilla.
-Events.EveryOneMinute.Add(MadScientist.OnSprinterPctChanged)
+-- One cheap sweep/minute (NOT per-tick): converts existing loaded zombies that
+-- qualify after SpawnChance is lowered, and re-applies sprinter speed when
+-- SprinterPercentage changed. Bounded to the loaded zombie list, int-compare
+-- early-outs per zombie.
+Events.EveryOneMinute.Add(MadScientist.OnPeriodicSweep)
 
 print("[MadScientist Mod] Server logic registered.")

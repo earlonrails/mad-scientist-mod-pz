@@ -1,0 +1,13 @@
+{
+    "Sandbox_MadScientist": "Mad Scientist Mod",
+    "Sandbox_MadScientist_SpawnChance": "Spawn Chance (1 in N)",
+    "Sandbox_MadScientist_SpawnChance_tooltip": "Denominator for the spawn roll when zombies spawn. Default 10000 = 1 in 10,000 chance.",
+    "Sandbox_MadScientist_IsSprinter": "Is Sprinter",
+    "Sandbox_MadScientist_IsSprinter_tooltip": "If enabled, the Mad Scientist zombie will sprint regardless of world zombie speed settings.",
+    "Sandbox_MadScientist_HealthMultiplier": "Health Multiplier",
+    "Sandbox_MadScientist_HealthMultiplier_tooltip": "Health multiplier for the Mad Scientist zombie (e.g. 3.0 = 3x tougher to kill).",
+    "Sandbox_MadScientist_DamageMultiplier": "Damage Multiplier",
+    "Sandbox_MadScientist_DamageMultiplier_tooltip": "Damage multiplier when the Mad Scientist attacks a player character.",
+    "Sandbox_MadScientist_CureGuaranteed": "Guaranteed Knox Vaccine Drop",
+    "Sandbox_MadScientist_CureGuaranteed_tooltip": "Guarantees that the Mad Scientist carries the Knox Virus Vaccine in inventory."
+}

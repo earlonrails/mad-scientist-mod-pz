@@ -1,5 +1,0 @@
-Items_EN = {
-    DisplayName_KnoxVirusCure = "Knox Virus Vaccine Syringe",
-    DisplayName_MadScientist.KnoxVirusCure = "Knox Virus Vaccine Syringe",
-    Tooltip_KnoxVirusCure = "An experimental vaccine synthesized by the Mad Scientist. Fully neutralizes the Knox Virus infection when injected.",
-}

@@ -95,15 +95,17 @@ function MadScientist.ShouldSprint(zombie)
 end
 
 --- Enforces the Mad Scientist's current speed type via the real IsoZombie API.
---- Called at spawn and every update tick so a changed SprinterPercentage applies
---- live to already-spawned zombies, like vanilla zombie speed.
+--- Applies the Mad Scientist's current speed type via the real IsoZombie API.
+--- Called at spawn and only re-applied when SprinterPercentage changes (see
+--- MadScientist.OnSprinterPctChanged) — matching vanilla, which caches each
+--- zombie's speedType rather than recomputing it every tick.
 function MadScientist.ApplySpeed(zombie)
     if not zombie then return end
     local wantSprinter = MadScientist.ShouldSprint(zombie)
 
     -- Compare against the engine's own speed-type constants rather than magic
-    -- numbers, so this stays correct if the enum values differ. Fall back to
-    -- always (re)applying if the constant/getter is unavailable.
+    -- numbers, so this stays correct if the enum values differ. Skip the call
+    -- when the zombie is already at the desired speed.
     if zombie.getSpeedType and IsoZombie then
         local current = zombie:getSpeedType()
         if wantSprinter and IsoZombie.SPEED_SPRINTER ~= nil
@@ -123,10 +125,27 @@ function MadScientist.ApplySpeed(zombie)
     end
 end
 
---- Re-assert speed each tick for Mad Scientists so sandbox changes apply live.
-function MadScientist.OnZombieUpdate(zombie)
-    if MadScientist.IsMadScientist(zombie) then
-        MadScientist.ApplySpeed(zombie)
+-- Tracks the last-seen SprinterPercentage so we only sweep zombies on a change.
+MadScientist.lastSprinterPct = nil
+
+--- Periodic cheap check: if SprinterPercentage changed since last time, sweep
+--- the currently-loaded zombies once and re-apply speed to Mad Scientists.
+--- This mirrors vanilla's cached model (no per-tick work) while still making a
+--- mid-game setting change take effect on already-spawned Mad Scientists.
+function MadScientist.OnSprinterPctChanged()
+    local pct = MadScientist.GetSandboxVar("SprinterPercentage", 100)
+    if pct == MadScientist.lastSprinterPct then return end
+    MadScientist.lastSprinterPct = pct
+
+    local cell = getCell and getCell()
+    if not cell then return end
+    local zombies = cell:getZombieList()
+    if not zombies then return end
+    for i = 0, zombies:size() - 1 do
+        local z = zombies:get(i)
+        if z and MadScientist.IsMadScientist(z) then
+            MadScientist.ApplySpeed(z)
+        end
     end
 end
 
@@ -159,7 +178,9 @@ end
 
 -- Register Event Handlers
 Events.OnZombieCreate.Add(MadScientist.OnZombieCreate)
-Events.OnZombieUpdate.Add(MadScientist.OnZombieUpdate)
 Events.OnZombieDead.Add(MadScientist.OnZombieDead)
+-- Cheap periodic check (not per-tick) to re-apply speed only when the
+-- SprinterPercentage sandbox option changes mid-game, mirroring vanilla.
+Events.EveryOneMinute.Add(MadScientist.OnSprinterPctChanged)
 
 print("[MadScientist Mod] Server logic registered.")

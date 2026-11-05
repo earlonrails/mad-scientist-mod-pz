@@ -98,6 +98,30 @@ function MadScientist.OnZombieCreate(zombie)
     MadScientist.EvaluateZombie(zombie)
 end
 
+-- Zombies within this many tiles of a player are treated as "on screen" and are
+-- NOT converted by the sweep, so you never watch one morph into the scientist
+-- in front of you. They convert later off-screen or via the reactivation path.
+local MADSCI_VISIBLE_RADIUS = 18
+
+--- True if the zombie is close enough to any active player to likely be on
+--- screen. Cheap: a squared-ish distance check per active player (usually 1).
+function MadScientist.IsNearAnyPlayer(zombie)
+    if not (getNumActivePlayers and IsoUtils and IsoUtils.DistanceTo) then
+        return false
+    end
+    local zx, zy = zombie:getX(), zombie:getY()
+    local n = getNumActivePlayers()
+    for i = 0, n - 1 do
+        local p = getSpecificPlayer(i)
+        if p and p:getZ() == zombie:getZ() then
+            if IsoUtils.DistanceTo(zx, zy, p:getX(), p:getY()) <= MADSCI_VISIBLE_RADIUS then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 --- Returns a stable per-zombie sprinter roll in 0..99. Stored once when the
 --- zombie becomes a Mad Scientist and compared to the CURRENT SprinterPercentage
 --- (roll < pct = sprinter), so its identity is fixed but the threshold is live.
@@ -184,7 +208,9 @@ function MadScientist.OnPeriodicSweep()
         if z then
             if z:getModData().isMadScientist then
                 if sprinterChanged then MadScientist.ApplySpeed(z) end
-            elseif threshold > 0 then
+            elseif threshold > 0 and not MadScientist.IsNearAnyPlayer(z) then
+                -- Only convert OFF-SCREEN zombies, so a player never sees one
+                -- morph into the Mad Scientist right in front of them.
                 MadScientist.EvaluateZombie(z)
             end
         end

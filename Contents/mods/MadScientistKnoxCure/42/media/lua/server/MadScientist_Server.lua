@@ -56,12 +56,21 @@ function MadScientist.MakeMadScientist(zombie)
     pcall(function() zombie:dressInNamedOutfit("Doctor") end)
     local inv = zombie:getInventory()
     if inv then
-        inv:AddItem("Base.LabCoat")
-        inv:AddItem("Base.Glasses_Reading")
-        inv:AddItem("Base.Gloves_Surgical")
-        inv:AddItem("Base.Mask_Surgical")
+        -- B42 item IDs (verified against vanilla clothing.txt). B41 names like
+        -- Base.LabCoat / Base.Mask_Surgical do NOT exist in B42 and AddItem on a
+        -- missing type returns null -> engine NPE in InstanceItem. Each is
+        -- pcall-guarded so one bad id can never crash the whole spawn.
+        local attire = {
+            "Base.JacketLong_Doctor", -- lab/doctor coat
+            "Base.Glasses_Reading",
+            "Base.Gloves_Surgical",
+            "Base.Hat_SurgicalMask",
+        }
+        for _, id in ipairs(attire) do
+            pcall(function() inv:AddItem(id) end)
+        end
         if cureGuaranteed then
-            inv:AddItem("MadScientist.KnoxVirusCure")
+            pcall(function() inv:AddItem("MadScientist.KnoxVirusCure") end)
         end
     end
 
@@ -223,7 +232,7 @@ function MadScientist.OnZombieDead(zombie)
     if MadScientist.IsMadScientist(zombie) then
         local inv = zombie:getInventory()
         if inv and not inv:contains("MadScientist.KnoxVirusCure") then
-            inv:AddItem("MadScientist.KnoxVirusCure")
+            pcall(function() inv:AddItem("MadScientist.KnoxVirusCure") end)
         end
     end
 end

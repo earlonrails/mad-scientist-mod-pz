@@ -8,7 +8,7 @@ module MadScientist
     item KnoxVirusCure
     {
         DisplayCategory = Medical,
-        Type = Normal,
+        ItemType = base:normal,
         DisplayName = Knox Virus Vaccine Syringe,
         Icon = Item_KnoxVirusCure,
         Weight = 0.1,

@@ -10,12 +10,14 @@ option MadScientist.SpawnChance
     translation = MadScientist_SpawnChance,
 }
 
-option MadScientist.IsSprinter
+option MadScientist.SprinterPercentage
 {
-    type = boolean,
-    default = true,
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
     page = MadScientist,
-    translation = MadScientist_IsSprinter,
+    translation = MadScientist_SprinterPercentage,
 }
 
 option MadScientist.HealthMultiplier

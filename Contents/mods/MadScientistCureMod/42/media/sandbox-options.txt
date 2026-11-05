@@ -47,3 +47,333 @@ option MadScientist.CureGuaranteed
     page = MadScientist,
     translation = MadScientist_CureGuaranteed,
 }
+
+option MadScientist.WeightAgoraphobic
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 30,
+    page = MadScientist,
+    translation = MadScientist_WeightAgoraphobic,
+}
+
+option MadScientist.WeightAllThumbs
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 30,
+    page = MadScientist,
+    translation = MadScientist_WeightAllThumbs,
+}
+
+option MadScientist.WeightClaustrophobic
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 30,
+    page = MadScientist,
+    translation = MadScientist_WeightClaustrophobic,
+}
+
+option MadScientist.WeightDeaf
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 15,
+    page = MadScientist,
+    translation = MadScientist_WeightDeaf,
+}
+
+option MadScientist.WeightClumsy
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightClumsy,
+}
+
+option MadScientist.WeightConspicuous
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightConspicuous,
+}
+
+option MadScientist.WeightDisorganized
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightDisorganized,
+}
+
+option MadScientist.WeightFastMetabolism
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightFastMetabolism,
+}
+
+option MadScientist.WeightFearOfBlood
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightFearOfBlood,
+}
+
+option MadScientist.WeightHardOfHearing
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 5,
+    page = MadScientist,
+    translation = MadScientist_WeightHardOfHearing,
+}
+
+option MadScientist.WeightHeartyAppetite
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightHeartyAppetite,
+}
+
+option MadScientist.WeightHighThirst
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightHighThirst,
+}
+
+option MadScientist.WeightHighWeight
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightHighWeight,
+}
+
+option MadScientist.WeightIlliterate
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 5,
+    page = MadScientist,
+    translation = MadScientist_WeightIlliterate,
+}
+
+option MadScientist.WeightLowWeight
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightLowWeight,
+}
+
+option MadScientist.WeightOutOfShape
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightOutOfShape,
+}
+
+option MadScientist.WeightProneToIllness
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightProneToIllness,
+}
+
+option MadScientist.WeightPuny
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 5,
+    page = MadScientist,
+    translation = MadScientist_WeightPuny,
+}
+
+option MadScientist.WeightReluctantFighter
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 30,
+    page = MadScientist,
+    translation = MadScientist_WeightReluctantFighter,
+}
+
+option MadScientist.WeightRestlessSleeper
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightRestlessSleeper,
+}
+
+option MadScientist.WeightShortOfBreath
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightShortOfBreath,
+}
+
+option MadScientist.WeightShortSighted
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightShortSighted,
+}
+
+option MadScientist.WeightSleepyhead
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightSleepyhead,
+}
+
+option MadScientist.WeightSlowHealer
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightSlowHealer,
+}
+
+option MadScientist.WeightSlowReader
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightSlowReader,
+}
+
+option MadScientist.WeightSmoker
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightSmoker,
+}
+
+option MadScientist.WeightSundayDriver
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightSundayDriver,
+}
+
+option MadScientist.WeightThinSkinned
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightThinSkinned,
+}
+
+option MadScientist.WeightUnfit
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 30,
+    page = MadScientist,
+    translation = MadScientist_WeightUnfit,
+}
+
+option MadScientist.WeightVeryHighWeight
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightVeryHighWeight,
+}
+
+option MadScientist.WeightVeryLowWeight
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightVeryLowWeight,
+}
+
+option MadScientist.WeightWeak
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 5,
+    page = MadScientist,
+    translation = MadScientist_WeightWeak,
+}
+
+option MadScientist.WeightWeakStomach
+{
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
+    page = MadScientist,
+    translation = MadScientist_WeightWeakStomach,
+}

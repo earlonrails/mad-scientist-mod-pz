@@ -32,16 +32,78 @@ function MadScientist.UseCure(player, item)
         end
     end
 
-    -- Visual feedback text above player
-    if HaloTextHelper and HaloTextHelper.addTextWithColor then
-        HaloTextHelper.addTextWithColor(player, "KNOX VIRUS CURED!", 0.1, 0.9, 0.2)
+    -- Visual feedback text above player (green = good; addGoodText is the only
+    -- working colored halo call in B42 -- the colored addText overloads crash).
+    if HaloTextHelper and HaloTextHelper.addGoodText then
+        HaloTextHelper.addGoodText(player, getText("IGUI_MadScientist_Cured"))
     end
     player:Say("The vaccine worked... The Knox Virus has been neutralized!")
+
+    -- Side effect: the experimental vaccine inflicts a random negative trait the
+    -- player doesn't already have, chosen by the configurable per-trait weights.
+    MadScientist.GrantRandomNegativeTrait(player)
 
     -- Consume the syringe item
     local inv = player:getInventory()
     if inv then
         inv:Remove(item)
+    end
+end
+
+--- Picks one eligible negative trait by weighted random and applies it, then
+--- shows a halo naming the trait. Eligible = positive weight, not already owned,
+--- and not gated out by the nutrition/sleep/MP checks. No-op if none eligible.
+function MadScientist.GrantRandomNegativeTrait(player)
+    if not player then return end
+    local traits = player.getCharacterTraits and player:getCharacterTraits()
+    if not traits then return end
+
+    local nutrition = MadScientist.IsNutritionEnabled()
+    local sleep = MadScientist.IsSleepEnabled()
+    local mp = MadScientist.IsMultiplayer()
+
+    -- Build the weighted eligible pool.
+    local pool, total = {}, 0
+    for _, t in ipairs(MadScientist.NEGATIVE_TRAITS) do
+        -- Resolve the engine's canonical trait type via the definition, so we
+        -- feed hasTrait/add exactly what getType() returns (avoids any id-string
+        -- drift); fall back to the raw id if the lookup is unavailable.
+        local traitType = t.trait
+        if CharacterTraitDefinition and CharacterTraitDefinition.getCharacterTraitDefinition then
+            local def = CharacterTraitDefinition.getCharacterTraitDefinition(t.trait)
+            if def and def.getType then traitType = def:getType() end
+        end
+
+        local weight = MadScientist.GetSandboxVar(t.opt, t.weight)
+        local eligible = weight and weight > 0
+        if eligible and t.requiresNutrition and not nutrition then eligible = false end
+        if eligible and t.requiresSleep and not sleep then eligible = false end
+        if eligible and t.disabledInMP and mp then eligible = false end
+        if eligible and player:hasTrait(traitType) then eligible = false end
+        if eligible then
+            total = total + weight
+            pool[#pool + 1] = { t = t, traitType = traitType, weight = weight }
+        end
+    end
+
+    if total <= 0 or #pool == 0 then return end
+
+    -- Weighted pick: roll 0..total-1 and walk the cumulative weights.
+    local roll = ZombRand and ZombRand(total) or (math.random(total) - 1)
+    local chosen
+    local acc = 0
+    for _, entry in ipairs(pool) do
+        acc = acc + entry.weight
+        if roll < acc then chosen = entry break end
+    end
+    chosen = chosen or pool[#pool]
+
+    traits:add(chosen.traitType)
+
+    -- Halo naming the trait they got (red/bad, since it's a drawback).
+    if HaloTextHelper and HaloTextHelper.addBadText then
+        local traitName = getText(chosen.t.name)
+        HaloTextHelper.addBadText(player, getText("IGUI_MadScientist_GotTrait", traitName))
     end
 end
 

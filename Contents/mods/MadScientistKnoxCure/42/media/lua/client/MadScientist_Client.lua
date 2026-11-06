@@ -53,6 +53,40 @@ function MadScientist.UseCure(player, item)
     end
 end
 
+-- Cache: our string id -> the engine CharacterTrait object that add() needs.
+-- CharacterTraits.add() requires a CharacterTrait (NOT a string), and
+-- CharacterTraitDefinition.getCharacterTraitDefinition() ALSO takes a
+-- CharacterTrait, so it can't convert a name for us. The only name->object
+-- source is iterating CharacterTraitDefinition.getTraits() (all definitions)
+-- and reading each def:getType() (a CharacterTrait). We match our id against
+-- the stringified type, case-insensitively and ignoring spaces/underscores, so
+-- it works whether getType() prints "out of shape", "OutOfShape" or
+-- "OUT_OF_SHAPE". Built once and cached.
+MadScientist._traitObjByKey = nil
+
+local function normKey(s)
+    return tostring(s):lower():gsub("[%s_]", "")
+end
+
+function MadScientist.GetTraitObject(id)
+    if MadScientist._traitObjByKey == nil then
+        MadScientist._traitObjByKey = {}
+        if CharacterTraitDefinition and CharacterTraitDefinition.getTraits then
+            local defs = CharacterTraitDefinition.getTraits()
+            if defs then
+                for i = 0, defs:size() - 1 do
+                    local def = defs:get(i)
+                    local ttype = def and def:getType()
+                    if ttype then
+                        MadScientist._traitObjByKey[normKey(ttype)] = ttype
+                    end
+                end
+            end
+        end
+    end
+    return MadScientist._traitObjByKey[normKey(id)]
+end
+
 --- Picks one eligible negative trait by weighted random and applies it, then
 --- shows a halo naming the trait. Eligible = positive weight, not already owned,
 --- and not gated out by the nutrition/sleep/MP checks. No-op if none eligible.
@@ -68,24 +102,18 @@ function MadScientist.GrantRandomNegativeTrait(player)
     -- Build the weighted eligible pool.
     local pool, total = {}, 0
     for _, t in ipairs(MadScientist.NEGATIVE_TRAITS) do
-        -- Resolve the engine's canonical trait type via the definition, so we
-        -- feed hasTrait/add exactly what getType() returns (avoids any id-string
-        -- drift); fall back to the raw id if the lookup is unavailable.
-        local traitType = t.trait
-        if CharacterTraitDefinition and CharacterTraitDefinition.getCharacterTraitDefinition then
-            local def = CharacterTraitDefinition.getCharacterTraitDefinition(t.trait)
-            if def and def.getType then traitType = def:getType() end
-        end
-
+        -- Resolve the engine CharacterTrait object for this id; skip the trait
+        -- entirely if it can't be resolved (never pass a raw string to add()).
+        local traitObj = MadScientist.GetTraitObject(t.trait)
         local weight = MadScientist.GetSandboxVar(t.opt, t.weight)
-        local eligible = weight and weight > 0
+        local eligible = traitObj ~= nil and weight and weight > 0
         if eligible and t.requiresNutrition and not nutrition then eligible = false end
         if eligible and t.requiresSleep and not sleep then eligible = false end
         if eligible and t.disabledInMP and mp then eligible = false end
-        if eligible and player:hasTrait(traitType) then eligible = false end
+        if eligible and player:hasTrait(t.trait) then eligible = false end
         if eligible then
             total = total + weight
-            pool[#pool + 1] = { t = t, traitType = traitType, weight = weight }
+            pool[#pool + 1] = { t = t, traitObj = traitObj, weight = weight }
         end
     end
 
@@ -101,7 +129,7 @@ function MadScientist.GrantRandomNegativeTrait(player)
     end
     chosen = chosen or pool[#pool]
 
-    traits:add(chosen.traitType)
+    pcall(function() traits:add(chosen.traitObj) end)
 
     -- Halo naming the trait they got (red/bad, since it's a drawback).
     if HaloTextHelper and HaloTextHelper.addBadText then

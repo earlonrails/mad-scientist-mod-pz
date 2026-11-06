@@ -117,7 +117,10 @@ function MadScientist.GrantRandomNegativeTrait(player)
         if eligible and t.requiresNutrition and not nutrition then eligible = false end
         if eligible and t.requiresSleep and not sleep then eligible = false end
         if eligible and t.disabledInMP and mp then eligible = false end
-        if eligible and player:hasTrait(t.trait) then eligible = false end
+        -- Already-owned check: CharacterTraits.get(CharacterTrait) -> boolean.
+        -- NOTE: player:hasTrait(string) is UNIMPLEMENTED in B42 (crashes); use
+        -- the CharacterTrait object against the traits collection instead.
+        if eligible and traits:get(traitObj) then eligible = false end
         if eligible then
             total = total + weight
             pool[#pool + 1] = { t = t, traitObj = traitObj, weight = weight }

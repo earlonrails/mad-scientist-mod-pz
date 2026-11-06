@@ -1,7 +1,7 @@
 {
     "Sandbox_MadScientist": "Mad Scientist Mod",
-    "Sandbox_MadScientist_SpawnChance": "Spawn Chance (1 in N)",
-    "Sandbox_MadScientist_SpawnChance_tooltip": "Denominator for the spawn roll when zombies spawn. Default 10000 = 1 in 10,000 chance.",
+    "Sandbox_MadScientist_SpawnChancePercent": "Spawn Chance (%)",
+    "Sandbox_MadScientist_SpawnChancePercent_tooltip": "Percent of zombies that become the Mad Scientist (0-100, decimals allowed). E.g. 0.5 = 0.5%, 0.01 is roughly 1 in 10,000. Raising this converts more existing zombies; lowering it does not un-convert ones already turned.",
     "Sandbox_MadScientist_SprinterPercentage": "Sprinter Percentage",
     "Sandbox_MadScientist_SprinterPercentage_tooltip": "Percent chance (0-100) that each Mad Scientist zombie is a sprinter, mirroring the vanilla Sprinter Percentage setting. 100 = always a sprinter, 0 = never. Changing this applies to already-spawned Mad Scientists.",
     "Sandbox_MadScientist_HealthMultiplier": "Health Multiplier",

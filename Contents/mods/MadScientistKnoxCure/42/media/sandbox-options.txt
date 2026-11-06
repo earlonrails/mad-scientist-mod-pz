@@ -1,13 +1,13 @@
 VERSION = 1,
 
-option MadScientist.SpawnChance
+option MadScientist.SpawnChancePercent
 {
-    type = integer,
-    min = 1,
-    max = 100000,
-    default = 10000,
+    type = double,
+    min = 0.0,
+    max = 100.0,
+    default = 0.5,
     page = MadScientist,
-    translation = MadScientist_SpawnChance,
+    translation = MadScientist_SpawnChancePercent,
 }
 
 option MadScientist.SprinterPercentage

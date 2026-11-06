@@ -6,11 +6,12 @@ MadScientist = MadScientist or {}
 --
 -- Vanilla-sprinter-style behaviour: each zombie gets ONE stable roll stored in
 -- modData (madSciRoll, 0..999999). It becomes the Mad Scientist when
--- madSciRoll < currentThreshold, where threshold = 1,000,000 / SpawnChance
--- (SpawnChance = "1 in N"). Because the roll is fixed but the threshold is read
--- live, LOWERING SpawnChance (bigger threshold) lets already-existing zombies
--- qualify and convert; RAISING it does not un-convert (one-way, like catching
--- the virus -- a zombie that already became the scientist stays one).
+-- madSciRoll < currentThreshold, where threshold = 1,000,000 * (percent/100)
+-- and percent = the SpawnChancePercent sandbox option (0-100, decimals allowed;
+-- e.g. 0.5 = 0.5% of zombies, 0.01 ~= the old 1-in-10,000). Because the roll is
+-- fixed but the threshold is read live, RAISING SpawnChancePercent (bigger
+-- threshold) lets already-existing zombies qualify and convert; LOWERING it does
+-- not un-convert (one-way -- a zombie that already became the scientist stays).
 --
 -- Evaluated on two cheap triggers (NO per-tick work):
 --   * OnZombieCreate  -> covers freshly spawned + virtual zombies realized as
@@ -22,12 +23,13 @@ MadScientist = MadScientist or {}
 
 local MADSCI_ROLL_RANGE = 1000000
 
---- Current qualifying threshold from the live SpawnChance ("1 in N").
+--- Current qualifying threshold from the live SpawnChancePercent (0-100).
 --- roll < threshold  => this zombie is the Mad Scientist.
 function MadScientist.GetSpawnThreshold()
-    local spawnChance = MadScientist.GetSandboxVar("SpawnChance", 10000)
-    if not spawnChance or spawnChance <= 0 then return 0 end
-    return MADSCI_ROLL_RANGE / spawnChance
+    local percent = MadScientist.GetSandboxVar("SpawnChancePercent", 0.5)
+    if not percent or percent <= 0 then return 0 end
+    if percent >= 100 then return MADSCI_ROLL_RANGE end
+    return MADSCI_ROLL_RANGE * (percent / 100)
 end
 
 --- Transforms a plain zombie into the Mad Scientist (outfit, stats, cure item).
@@ -91,8 +93,11 @@ function MadScientist.EvaluateZombie(zombie)
     end
 
     -- Stable per-zombie roll, assigned once and persisted in modData.
+    -- ZombRand(N) is the real PZ global (returns 0..N-1); if it's somehow
+    -- unavailable, fall back to a HIGH roll so the zombie does NOT convert
+    -- (never default to 0, which would make every zombie qualify).
     if modData.madSciRoll == nil then
-        modData.madSciRoll = ZomboidRandom and ZomboidRandom(MADSCI_ROLL_RANGE) or 0
+        modData.madSciRoll = ZombRand and ZombRand(MADSCI_ROLL_RANGE) or (MADSCI_ROLL_RANGE - 1)
     end
 
     if modData.madSciRoll < MadScientist.GetSpawnThreshold() then
@@ -135,8 +140,8 @@ end
 --- zombie becomes a Mad Scientist and compared to the CURRENT SprinterPercentage
 --- (roll < pct = sprinter), so its identity is fixed but the threshold is live.
 function MadScientist.RollSprintThreshold()
-    if ZomboidRandom then
-        return ZomboidRandom(100) -- 0..99
+    if ZombRand then
+        return ZombRand(100) -- 0..99
     end
     return 0 -- fallback: treat as sprinter for any pct > 0
 end

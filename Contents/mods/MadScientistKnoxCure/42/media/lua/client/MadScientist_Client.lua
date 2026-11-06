@@ -1,7 +1,7 @@
 -- MadScientist_Client.lua
 MadScientist = MadScientist or {}
 
---- Handler for using/injecting the Knox Virus Vaccine
+--- Handler for using/injecting the Knox Virus Cure
 function MadScientist.UseCure(player, item)
     if not player or not item then return end
 
@@ -40,9 +40,9 @@ function MadScientist.UseCure(player, item)
     if HaloTextHelper and HaloTextHelper.addGoodText then
         HaloTextHelper.addGoodText(player, getText("IGUI_MadScientist_Cured"))
     end
-    player:Say("The vaccine worked... The Knox Virus has been neutralized!")
+    player:Say("The cure worked... The Knox Virus has been neutralized!")
 
-    -- Side effect: the experimental vaccine inflicts a random negative trait the
+    -- Side effect: the experimental cure inflicts a random negative trait the
     -- player doesn't already have, chosen by the configurable per-trait weights.
     MadScientist.GrantRandomNegativeTrait(player)
 
@@ -148,12 +148,12 @@ function MadScientist.GrantRandomNegativeTrait(player)
     end
 end
 
---- Add context menu option when right-clicking the Knox Virus Vaccine in inventory
+--- Add context menu option when right-clicking the Knox Virus Cure in inventory
 function MadScientist.OnFillInventoryObjectContextMenu(playerNum, context, items)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
 
-    local vaccineItem = nil
+    local cureItem = nil
 
     for _, itemData in ipairs(items) do
         local item = itemData
@@ -162,14 +162,14 @@ function MadScientist.OnFillInventoryObjectContextMenu(playerNum, context, items
         end
 
         if item and (item:getFullType() == "MadScientist.KnoxVirusCure" or item:getType() == "KnoxVirusCure") then
-            vaccineItem = item
+            cureItem = item
             break
         end
     end
 
-    if vaccineItem then
-        local optionName = getText("ContextMenu_MadScientist_InjectCure") or "Inject Knox Virus Vaccine"
-        context:addOption(optionName, player, MadScientist.UseCure, vaccineItem)
+    if cureItem then
+        local optionName = getText("ContextMenu_MadScientist_InjectCure") or "Inject Knox Virus Cure"
+        context:addOption(optionName, player, MadScientist.UseCure, cureItem)
     end
 end
 

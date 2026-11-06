@@ -48,7 +48,7 @@ function MadScientist.IsMadScientist(zombie)
 end
 
 -- ---------------------------------------------------------------------------
--- Negative traits granted when the Knox Virus Vaccine is used.
+-- Negative traits granted when the Knox Virus Cure is used.
 --
 -- Single source of truth for: the sandbox option name (one weight slider per
 -- trait), the engine trait id passed to getCharacterTraits():add(), the vanilla

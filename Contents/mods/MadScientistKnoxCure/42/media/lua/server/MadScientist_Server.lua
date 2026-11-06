@@ -231,7 +231,7 @@ function MadScientist.OnPeriodicSweep()
     end
 end
 
---- Ensures the Knox Virus Vaccine is on the corpse when Mad Scientist dies
+--- Ensures the Knox Virus Cure is on the corpse when Mad Scientist dies
 function MadScientist.OnZombieDead(zombie)
     if not zombie then return end
     if MadScientist.IsMadScientist(zombie) then

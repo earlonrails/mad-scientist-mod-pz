@@ -1,11 +1,42 @@
 -- MadScientist_Shared.lua
 MadScientist = MadScientist or {}
 
---- Returns sandbox configuration value with fallback default
+--- Reads a sandbox option's LIVE value by its full dotted name (e.g.
+--- "MadScientist.SpawnChancePercent", "Nutrition") via getSandboxOptions().
+--- The `SandboxVars` Lua table is only a snapshot and does NOT refresh when an
+--- admin changes options mid-game, so it reports stale values; the
+--- getSandboxOptions():getOptionByName():getValue() path is the live truth
+--- (verified in-game: live getValue tracked the admin toggle, SandboxVars did
+--- not). Returns nil if the option/getter is unavailable.
+local function readLiveOption(fullName)
+    if not getSandboxOptions then return nil end
+    local ok, value = pcall(function()
+        local opts = getSandboxOptions()
+        if not opts then return nil end
+        local opt = opts:getOptionByName(fullName)
+        if opt and opt.getValue then return opt:getValue() end
+        return nil
+    end)
+    if ok then return value end
+    return nil
+end
+
+--- Returns a MadScientist.* sandbox value (live), falling back to the stale
+--- SandboxVars table, then the supplied default.
 function MadScientist.GetSandboxVar(varName, defaultValue)
+    local live = readLiveOption("MadScientist." .. varName)
+    if live ~= nil then return live end
     if SandboxVars and SandboxVars.MadScientist and SandboxVars.MadScientist[varName] ~= nil then
         return SandboxVars.MadScientist[varName]
     end
+    return defaultValue
+end
+
+--- Returns a vanilla (top-level) sandbox option's live value, else the default.
+function MadScientist.GetVanillaSandboxVar(name, defaultValue)
+    local live = readLiveOption(name)
+    if live ~= nil then return live end
+    if SandboxVars and SandboxVars[name] ~= nil then return SandboxVars[name] end
     return defaultValue
 end
 
@@ -73,19 +104,14 @@ MadScientist.NEGATIVE_TRAITS = {
 }
 
 --- True when the game's nutrition system is enabled (weight/metabolism traits).
+--- Reads the LIVE option so an admin toggle mid-game is respected.
 function MadScientist.IsNutritionEnabled()
-    if SandboxVars and SandboxVars.Nutrition ~= nil then
-        return SandboxVars.Nutrition == true
-    end
-    return true -- default on
+    return MadScientist.GetVanillaSandboxVar("Nutrition", true) == true
 end
 
 --- True when sleep is enabled (single-player always; MP via SleepAllowed).
 function MadScientist.IsSleepEnabled()
-    if SandboxVars and SandboxVars.SleepAllowed ~= nil then
-        return SandboxVars.SleepAllowed == true
-    end
-    return true
+    return MadScientist.GetVanillaSandboxVar("SleepAllowed", true) == true
 end
 
 --- True when the current game is multiplayer.

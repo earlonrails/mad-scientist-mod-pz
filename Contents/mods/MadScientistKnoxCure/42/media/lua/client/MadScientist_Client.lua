@@ -64,8 +64,15 @@ end
 -- "OUT_OF_SHAPE". Built once and cached.
 MadScientist._traitObjByKey = nil
 
+-- Normalize a trait id/type to a comparable key. def:getType() stringifies as
+-- "base:slowlearner" (module prefix + lowercase id, no spaces); our ids are the
+-- bare lowercase id, sometimes with spaces (e.g. "out of shape"). Strip any
+-- "module:" prefix and all spaces/underscores, lowercase, so both sides match.
 local function normKey(s)
-    return tostring(s):lower():gsub("[%s_]", "")
+    local str = tostring(s):lower()
+    str = str:gsub("^[%w]+:", "")   -- drop a leading "base:" / "<module>:" prefix
+    str = str:gsub("[%s_]", "")      -- drop spaces and underscores
+    return str
 end
 
 function MadScientist.GetTraitObject(id)

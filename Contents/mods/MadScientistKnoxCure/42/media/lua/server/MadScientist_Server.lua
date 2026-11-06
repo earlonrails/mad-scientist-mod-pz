@@ -26,7 +26,7 @@ local MADSCI_ROLL_RANGE = 1000000
 --- Current qualifying threshold from the live SpawnChancePercent (0-100).
 --- roll < threshold  => this zombie is the Mad Scientist.
 function MadScientist.GetSpawnThreshold()
-    local percent = MadScientist.GetSandboxVar("SpawnChancePercent", 0.5)
+    local percent = MadScientist.GetSandboxVar("SpawnChancePercent", 0.1)
     if not percent or percent <= 0 then return 0 end
     if percent >= 100 then return MADSCI_ROLL_RANGE end
     return MADSCI_ROLL_RANGE * (percent / 100)

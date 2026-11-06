@@ -10,26 +10,29 @@ function MadScientist.UseCure(player, item)
         player:getEmitter():playSound("Inject")
     end
 
-    -- Clear Knox Virus Infection
+    -- Clear Knox Virus infection using ONLY verified B42 BodyDamage API.
+    -- B41 methods setInfectionLevel / setFoodSicknessLevel / setPoisonLevel do
+    -- NOT exist in B42 (calling them is "tried to call nil" and crashes). The
+    -- B42 cure path is: clear the infected flag, zero the infection timers, and
+    -- RestoreToFullHealth() (which also resets the body parts / wounds).
     local bodyDamage = player:getBodyDamage()
     if bodyDamage then
-        bodyDamage:setInfected(false)
-        bodyDamage:setInfectionLevel(0)
-        bodyDamage:setInfectionTime(-1)
-        bodyDamage:setInfectionMortalityDuration(-1)
-        bodyDamage:setFoodSicknessLevel(0)
-        bodyDamage:setPoisonLevel(0)
-
-        -- Clear infection from individual body parts
+        pcall(function() bodyDamage:setInfected(false) end)
+        pcall(function() bodyDamage:setInfectionTime(-1) end)
+        pcall(function() bodyDamage:setInfectionMortalityDuration(-1) end)
+        pcall(function() bodyDamage:setInfectionGrowthRate(0) end)
+        -- Clear wound infection on each body part (B42: setWoundInfectionLevel).
         local bodyParts = bodyDamage:getBodyParts()
         if bodyParts then
             for i = 0, bodyParts:size() - 1 do
                 local part = bodyParts:get(i)
                 if part then
-                    part:setInfectedWound(false)
+                    pcall(function() part:SetInfected(false) end)
+                    pcall(function() part:setWoundInfectionLevel(-1) end)
                 end
             end
         end
+        pcall(function() bodyDamage:RestoreToFullHealth() end)
     end
 
     -- Visual feedback text above player (green = good; addGoodText is the only

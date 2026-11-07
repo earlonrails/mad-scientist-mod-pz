@@ -1,6 +1,6 @@
 version=1
 id=
-title=Crazy Mad Scientist Zombie & Knox Virus Cure
-description=Spawns a rare Crazy Mad Scientist zombie (1 in 10,000 chance by default) carrying the cure to the Knox Virus! Highly dangerous, fast (sprinter), tough to kill, and hits hard. Fully configurable via Sandbox Options.
+title=The Mad Scientist's Cure
+description=Spawns a rare Mad Scientist zombie (1 in 1,000 chance by default) carrying the cure to the Knox Virus! Highly dangerous, fast (sprinter), tough to kill, and hits hard. Using the cure clears the infection but inflicts a random negative trait. Fully configurable via Sandbox Options.
 tags=Build 42
 visibility=public

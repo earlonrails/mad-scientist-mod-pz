@@ -27,7 +27,7 @@ function MadScientist.SpawnTestScientist()
     end
 end
 
---- Debug function to add Knox Virus Vaccine syringe directly to inventory
+--- Debug function to add Knox Virus Cure syringe directly to inventory
 function MadScientist.GiveTestCure()
     local player = getPlayer()
     if not player then return end
@@ -35,7 +35,7 @@ function MadScientist.GiveTestCure()
     local inv = player:getInventory()
     if inv then
         inv:AddItem("MadScientist.KnoxVirusCure")
-        player:Say("[Debug] Added Knox Virus Vaccine to inventory!")
+        player:Say("[Debug] Added Knox Virus Cure to inventory!")
     end
 end
 

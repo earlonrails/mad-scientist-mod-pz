@@ -177,3 +177,5 @@ end
 -- Register Client Event Hooks
 Events.OnFillInventoryObjectContextMenu.Add(MadScientist.OnFillInventoryObjectContextMenu)
 
+print("[MadScientist Mod] Client logic registered.")
+

@@ -258,3 +258,5 @@ Events.OnZombieDead.Add(MadScientist.OnZombieDead)
 -- early-outs per zombie.
 Events.EveryOneMinute.Add(MadScientist.OnPeriodicSweep)
 
+print("[MadScientist Mod] Server logic registered.")
+

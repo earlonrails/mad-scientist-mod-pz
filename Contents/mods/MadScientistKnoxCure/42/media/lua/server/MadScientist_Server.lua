@@ -54,26 +54,20 @@ function MadScientist.MakeMadScientist(zombie)
     modData.madScientistSprintRoll = MadScientist.RollSprintThreshold()
     MadScientist.ApplySpeed(zombie)
 
-    -- Outfit + attire
-    pcall(function() zombie:dressInNamedOutfit("Doctor") end)
+    -- Outfit: dress the zombie in the vanilla "Doctor" outfit. Zombies render
+    -- clothing via the outfit/descriptor system, NOT runtime setWornItem --
+    -- dressInPersistentOutfit("Doctor") visibly dresses the zombie (confirmed
+    -- in-game), whereas dressInNamedOutfit and hand-equipping items via
+    -- setWornItem do NOT render on a zombie. "Doctor" is a verified vanilla
+    -- outfit name. (TODO: layer an NBC mask on top once the outfit/descriptor
+    -- attach path is worked out -- setWornItem equips it on the data model but
+    -- it won't render on a zombie.)
+    pcall(function() zombie:dressInPersistentOutfit("Doctor") end)
+
+    -- Cure item goes IN the inventory (to loot from the corpse), not worn.
     local inv = zombie:getInventory()
-    if inv then
-        -- B42 item IDs (verified against vanilla clothing.txt). B41 names like
-        -- Base.LabCoat / Base.Mask_Surgical do NOT exist in B42 and AddItem on a
-        -- missing type returns null -> engine NPE in InstanceItem. Each is
-        -- pcall-guarded so one bad id can never crash the whole spawn.
-        local attire = {
-            "Base.JacketLong_Doctor", -- lab/doctor coat
-            "Base.Glasses_Reading",
-            "Base.Gloves_Surgical",
-            "Base.Hat_SurgicalMask",
-        }
-        for _, id in ipairs(attire) do
-            pcall(function() inv:AddItem(id) end)
-        end
-        if cureGuaranteed then
-            pcall(function() inv:AddItem("MadScientist.KnoxVirusCure") end)
-        end
+    if inv and cureGuaranteed then
+        pcall(function() inv:AddItem("MadScientist.KnoxVirusCure") end)
     end
 
     print("[MadScientist Mod] Mad Scientist Zombie created! (SprintRoll=" ..

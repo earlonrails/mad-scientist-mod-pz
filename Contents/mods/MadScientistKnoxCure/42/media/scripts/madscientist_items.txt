@@ -10,7 +10,7 @@ module MadScientist
         DisplayCategory = Medical,
         ItemType = base:normal,
         DisplayName = Knox Virus Cure,
-        Icon = Item_KnoxVirusCure,
+        Icon = KnoxVirusCure,
         Weight = 0.1,
         Medical = TRUE,
         WorldStaticModel = Syringe,

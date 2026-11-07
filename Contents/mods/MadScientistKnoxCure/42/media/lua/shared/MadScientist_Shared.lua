@@ -119,4 +119,3 @@ function MadScientist.IsMultiplayer()
     return (isClient and isClient()) or (isServer and isServer()) or false
 end
 
-print("[MadScientist Mod] Shared initialized successfully.")

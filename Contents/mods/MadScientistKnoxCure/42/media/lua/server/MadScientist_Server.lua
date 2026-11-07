@@ -68,8 +68,7 @@ function MadScientist.MakeMadScientist(zombie)
         pcall(function() inv:AddItem("MadScientist.KnoxVirusCure") end)
     end
 
-    print("[MadScientist Mod] Mad Scientist Zombie created! (SprintRoll=" ..
-        tostring(modData.madScientistSprintRoll) .. ", HealthMult=" .. tostring(healthMult) .. "x)")
+    print("[MadScientist Mod] A zombie was converted into a Mad Scientist.")
 end
 
 --- Assigns the stable roll if missing, then converts the zombie IF it now
@@ -259,4 +258,3 @@ Events.OnZombieDead.Add(MadScientist.OnZombieDead)
 -- early-outs per zombie.
 Events.EveryOneMinute.Add(MadScientist.OnPeriodicSweep)
 
-print("[MadScientist Mod] Server logic registered.")

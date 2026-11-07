@@ -58,7 +58,8 @@ function MadScientist.MakeMadScientist(zombie)
     -- clothing via the outfit/descriptor system, NOT runtime setWornItem --
     -- dressInPersistentOutfit(name) visibly dresses the zombie (confirmed
     -- in-game), whereas dressInNamedOutfit and hand-equipping items via
-    -- setWornItem do NOT render on a zombie. "MadScientist" resolves in-game.
+    -- setWornItem do NOT render on a zombie. "MadScientist" is a vanilla B42
+    -- outfit name.
     pcall(function() zombie:dressInPersistentOutfit("MadScientist") end)
 
     -- Cure item goes IN the inventory (to loot from the corpse), not worn.

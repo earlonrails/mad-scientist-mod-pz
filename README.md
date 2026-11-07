@@ -1,4 +1,4 @@
-# Crazy Mad Scientist Zombie & Knox Virus Cure
+# The Mad Scientist's Cure
 
 Project Zomboid **Build 42** mod. Spawns a rare "Mad Scientist" zombie carrying
 the cure to the Knox Virus. The scientist is a configurable sprinter, tougher

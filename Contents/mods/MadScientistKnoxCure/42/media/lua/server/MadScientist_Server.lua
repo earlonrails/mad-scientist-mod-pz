@@ -54,15 +54,12 @@ function MadScientist.MakeMadScientist(zombie)
     modData.madScientistSprintRoll = MadScientist.RollSprintThreshold()
     MadScientist.ApplySpeed(zombie)
 
-    -- Outfit: dress the zombie in the vanilla "Doctor" outfit. Zombies render
+    -- Outfit: dress the zombie in the "MadScientist" outfit. Zombies render
     -- clothing via the outfit/descriptor system, NOT runtime setWornItem --
-    -- dressInPersistentOutfit("Doctor") visibly dresses the zombie (confirmed
+    -- dressInPersistentOutfit(name) visibly dresses the zombie (confirmed
     -- in-game), whereas dressInNamedOutfit and hand-equipping items via
-    -- setWornItem do NOT render on a zombie. "Doctor" is a verified vanilla
-    -- outfit name. (TODO: layer an NBC mask on top once the outfit/descriptor
-    -- attach path is worked out -- setWornItem equips it on the data model but
-    -- it won't render on a zombie.)
-    pcall(function() zombie:dressInPersistentOutfit("Doctor") end)
+    -- setWornItem do NOT render on a zombie. "MadScientist" resolves in-game.
+    pcall(function() zombie:dressInPersistentOutfit("MadScientist") end)
 
     -- Cure item goes IN the inventory (to loot from the corpse), not worn.
     local inv = zombie:getInventory()

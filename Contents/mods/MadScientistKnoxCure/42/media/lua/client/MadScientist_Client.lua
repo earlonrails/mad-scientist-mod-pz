@@ -41,6 +41,7 @@ function MadScientist.UseCure(player, item)
         HaloTextHelper.addGoodText(player, getText("IGUI_MadScientist_Cured"))
     end
     player:Say("The cure worked... The Knox Virus has been neutralized!")
+    print("[MadScientist Mod] A player used the Knox Virus Cure.")
 
     -- Side effect: the experimental cure inflicts a random negative trait the
     -- player doesn't already have, chosen by the configurable per-trait weights.
@@ -177,3 +178,4 @@ end
 Events.OnFillInventoryObjectContextMenu.Add(MadScientist.OnFillInventoryObjectContextMenu)
 
 print("[MadScientist Mod] Client logic registered.")
+

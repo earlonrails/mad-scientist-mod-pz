@@ -120,3 +120,4 @@ function MadScientist.IsMultiplayer()
 end
 
 print("[MadScientist Mod] Shared initialized successfully.")
+

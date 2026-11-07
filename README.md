@@ -43,9 +43,3 @@ git pull
 
 **Restart Project Zomboid after cloning or pulling** — it caches the mod scan at
 launch. Then enable the mod in-game and start/load a Build 42 world.
-
-## Notes
-
-- The "MadScientist" outfit the zombie wears is provided by another mod in the
-  test setup, not vanilla B42. On a clean install without that outfit, the
-  zombie spawns without the outfit (the call is guarded and will not error).

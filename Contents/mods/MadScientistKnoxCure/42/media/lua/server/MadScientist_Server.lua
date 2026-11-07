@@ -58,7 +58,8 @@ function MadScientist.MakeMadScientist(zombie)
     -- clothing via the outfit/descriptor system, NOT runtime setWornItem --
     -- dressInPersistentOutfit(name) visibly dresses the zombie (confirmed
     -- in-game), whereas dressInNamedOutfit and hand-equipping items via
-    -- setWornItem do NOT render on a zombie. "MadScientist" resolves in-game.
+    -- setWornItem do NOT render on a zombie. "MadScientist" is a vanilla B42
+    -- outfit name.
     pcall(function() zombie:dressInPersistentOutfit("MadScientist") end)
 
     -- Cure item goes IN the inventory (to loot from the corpse), not worn.
@@ -67,8 +68,7 @@ function MadScientist.MakeMadScientist(zombie)
         pcall(function() inv:AddItem("MadScientist.KnoxVirusCure") end)
     end
 
-    print("[MadScientist Mod] Mad Scientist Zombie created! (SprintRoll=" ..
-        tostring(modData.madScientistSprintRoll) .. ", HealthMult=" .. tostring(healthMult) .. "x)")
+    print("[MadScientist Mod] A zombie was converted into a Mad Scientist.")
 end
 
 --- Assigns the stable roll if missing, then converts the zombie IF it now
@@ -259,3 +259,4 @@ Events.OnZombieDead.Add(MadScientist.OnZombieDead)
 Events.EveryOneMinute.Add(MadScientist.OnPeriodicSweep)
 
 print("[MadScientist Mod] Server logic registered.")
+

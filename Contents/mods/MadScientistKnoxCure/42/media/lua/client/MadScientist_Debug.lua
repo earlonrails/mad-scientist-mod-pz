@@ -4,10 +4,7 @@ MadScientist = MadScientist or {}
 --- Debug function to spawn a Mad Scientist zombie next to player
 function MadScientist.SpawnTestScientist()
     local player = getPlayer()
-    if not player then
-        print("[MadScientist Debug] No active player found.")
-        return
-    end
+    if not player then return end
 
     local square = player:getSquare()
     if not square then return end
@@ -22,8 +19,6 @@ function MadScientist.SpawnTestScientist()
         modData.forceMadScientist = true
         MadScientist.OnZombieCreate(zombie)
         player:Say("[Debug] Spawned Mad Scientist Zombie at (" .. x .. ", " .. y .. ")!")
-    else
-        print("[MadScientist Debug] Failed to spawn zombie.")
     end
 end
 
@@ -39,4 +34,3 @@ function MadScientist.GiveTestCure()
     end
 end
 
-print("[MadScientist Mod] Debug tools available: MadScientist.SpawnTestScientist(), MadScientist.GiveTestCure()")
